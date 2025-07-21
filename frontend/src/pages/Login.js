@@ -10,40 +10,41 @@ import {
   Alert,
 } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
     try {
-      // TODO: Implement login API call
-      console.log('Login data:', formData);
-      
-      // Simulate successful login
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
+      await login(formData.email, formData.password);
+      navigate('/dashboard');
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -103,9 +104,9 @@ const Login = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
             <Box textAlign="center">
               <Typography variant="body2">

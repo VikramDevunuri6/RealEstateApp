@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -10,7 +10,6 @@ import {
 import { Home as HomeIcon } from '@mui/icons-material';
 
 const Navbar = () => {
-  const navigate = useNavigate();
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>

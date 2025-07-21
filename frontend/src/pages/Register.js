@@ -10,9 +10,11 @@ import {
   Alert,
 } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -20,32 +22,36 @@ const Register = () => {
     phoneNumber: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
+    // Basic validation
+    if (!formData.fullName || !formData.email || !formData.password || !formData.phoneNumber) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
     try {
-      // TODO: Implement registration API call
-      console.log('Register data:', formData);
-      
-      // Simulate successful registration
-      setTimeout(() => {
-        navigate('/login');
-      }, 1000);
+      await register(formData);
+      navigate('/dashboard');
     } catch (err) {
-      setError('Registration failed. Please try again later.');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Registration failed. Please try again later.');
     }
   };
 
@@ -128,9 +134,9 @@ const Register = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? 'Signing Up...' : 'Sign Up'}
+              {isLoading ? 'Signing Up...' : 'Sign Up'}
             </Button>
             <Box textAlign="center">
               <Typography variant="body2">
